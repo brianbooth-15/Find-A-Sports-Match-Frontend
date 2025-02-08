@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-// Initial Fake Event Data
+// Initial Fake Event Data with Cost Field
 const initialEvents = [
-  { id: "1", sport: "Tennis", skill: "Intermediate", date: "10/02/2025", startTime: "15:00", endTime: "16:30", participants: 4, gender: "Both" },
-  { id: "2", sport: "Football", skill: "Advanced", date: "12/02/2025", startTime: "18:00", endTime: "20:00", participants: 10, gender: "Male" },
-  { id: "3", sport: "Swimming", skill: "Beginner", date: "15/02/2025", startTime: "10:00", endTime: "11:00", participants: 5, gender: "Female" },
-  { id: "4", sport: "Basketball", skill: "Intermediate", date: "18/02/2025", startTime: "17:30", endTime: "19:00", participants: 6, gender: "Both" },
+  { id: "1", sport: "Tennis", skill: "Intermediate", date: "10/02/2025", startTime: "15:00", endTime: "16:30", participants: 4, gender: "Both", cost: 10 },
+  { id: "2", sport: "Football", skill: "Advanced", date: "12/02/2025", startTime: "18:00", endTime: "20:00", participants: 10, gender: "Male", cost: 0 }, // Free event
+  { id: "3", sport: "Swimming", skill: "Beginner", date: "15/02/2025", startTime: "10:00", endTime: "11:00", participants: 5, gender: "Female", cost: 5 },
+  { id: "4", sport: "Basketball", skill: "Intermediate", date: "18/02/2025", startTime: "17:30", endTime: "19:00", participants: 6, gender: "Both", cost: 15 },
 ];
 
 export default function ManageEventsScreen() {
@@ -37,7 +37,10 @@ export default function ManageEventsScreen() {
       <Text style={styles.eventText}><Text style={styles.bold}>End Time:</Text> {item.endTime}</Text>
       <Text style={styles.eventText}><Text style={styles.bold}>Participants:</Text> {item.participants}</Text>
       <Text style={styles.eventText}><Text style={styles.bold}>Gender:</Text> {item.gender}</Text>
-
+      <Text style={styles.eventText}>
+        <Text style={styles.bold}>Cost:</Text> {typeof item.cost === "number" ? (item.cost === 0 ? "Free" : `£${item.cost}`) : "Free"}
+      </Text>
+  
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.editButton} onPress={() => handleEditEvent(item)}>
@@ -49,6 +52,8 @@ export default function ManageEventsScreen() {
       </View>
     </View>
   );
+  
+  
 
   return (
     <View style={styles.container}>

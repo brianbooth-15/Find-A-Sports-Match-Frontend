@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { Picker } from '@react-native-picker/picker';  // Correct import
+import { 
+  View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, 
+  KeyboardAvoidingView, Platform 
+} from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Slider from "@react-native-community/slider";
 import moment from "moment";
 
 const sportsList = [
@@ -21,7 +25,8 @@ export default function CreateEventScreen({ navigation }) {
   const [endTime, setEndTime] = useState("");
   const [numParticipants, setNumParticipants] = useState("");
   const [selectedGender, setSelectedGender] = useState("Both");
-  
+  const [cost, setCost] = useState(0); // Default to Free (£0)
+
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isStartTimePickerVisible, setStartTimePickerVisible] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisible] = useState(false);
@@ -51,9 +56,8 @@ export default function CreateEventScreen({ navigation }) {
   };
 
   const handleSaveEvent = () => {
-    // Here you would save the event to a database or state management
     console.log("Event saved:", {
-      selectedSport, selectedSkill, date, startTime, endTime, numParticipants, selectedGender
+      selectedSport, selectedSkill, date, startTime, endTime, numParticipants, selectedGender, cost
     });
     navigation.navigate("Home");
   };
@@ -61,9 +65,9 @@ export default function CreateEventScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}  // Ensures the button stays above the keyboard on iOS
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}> {/* Scrollable content */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.header}>Create Event</Text>
 
         {/* Sport Selection */}
@@ -93,19 +97,19 @@ export default function CreateEventScreen({ navigation }) {
         {/* Date Selection */}
         <Text style={styles.label}>Select Date</Text>
         <TouchableOpacity onPress={showDatePicker}>
-          <Text style={styles.dateText}>{date || "Choose Date"}</Text> {/* Wrap text in Text component */}
+          <Text style={styles.dateText}>{date || "Choose Date"}</Text>
         </TouchableOpacity>
 
         {/* Start Time Selection */}
         <Text style={styles.label}>Start Time</Text>
         <TouchableOpacity onPress={showStartTimePicker}>
-          <Text style={styles.timeText}>{startTime || "Choose Start Time"}</Text> {/* Wrap text in Text component */}
+          <Text style={styles.timeText}>{startTime || "Choose Start Time"}</Text>
         </TouchableOpacity>
 
         {/* End Time Selection */}
         <Text style={styles.label}>End Time</Text>
         <TouchableOpacity onPress={showEndTimePicker}>
-          <Text style={styles.timeText}>{endTime || "Choose End Time"}</Text> {/* Wrap text in Text component */}
+          <Text style={styles.timeText}>{endTime || "Choose End Time"}</Text>
         </TouchableOpacity>
 
         {/* Number of Participants */}
@@ -129,6 +133,21 @@ export default function CreateEventScreen({ navigation }) {
             <Picker.Item key={gender} label={gender} value={gender} />
           ))}
         </Picker>
+
+        {/* Cost Selection */}
+        <Text style={styles.label}>Event Cost (£)</Text>
+        <Text style={styles.costValue}>£{cost}</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={200}
+          step={5}
+          value={cost}
+          onValueChange={(value) => setCost(value)}
+          minimumTrackTintColor="#007AFF"
+          maximumTrackTintColor="#ddd"
+          thumbTintColor="#007AFF"
+        />
 
         {/* Save Event Button */}
         <Button title="Save Event" onPress={handleSaveEvent} />
@@ -168,7 +187,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    paddingBottom: 80, // Add padding to ensure the button isn't cut off
+    paddingBottom: 80,
   },
   header: {
     fontSize: 24,
@@ -182,7 +201,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   picker: {
-    height: 60,  // Increased height for picker
+    height: 60,
     width: "100%",
     marginBottom: 15,
     justifyContent: "center",
@@ -213,4 +232,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginBottom: 15,
   },
+  costValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  slider: {
+    width: "100%",
+    height: 40,
+  },
 });
+

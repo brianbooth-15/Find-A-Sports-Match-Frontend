@@ -10,11 +10,14 @@ import { auth } from "./firebaseConfig"; // Import Firebase auth
 
 import EditEventScreen from "./screens/EditEventScreen"; // Import the new screen
 import ManageEventsScreen from "./screens/ManageEventsScreen"; // Import the new screen
+import SearchForMatchScreen from './screens/SearchForMatchScreen';  // Import the new screen
 import LoginScreen from "./screens/LoginScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import CreateEventScreen from "./screens/CreateEventScreen"; // Import the CreateEvent screen
 import HomeScreen from "./screens/HomeScreen";
+import ManageFriendsScreen from "./screens/ManageFriendsScreen"; // ✅ Add this import
+import SearchFriendsScreen from "./screens/SearchFriendsScreen"; // ✅ Add this impor
 
 const Stack = createStackNavigator();
 
@@ -57,6 +60,10 @@ export default function App() {
           <Stack.Screen name="CreateEvent" component={CreateEventScreen} />
           <Stack.Screen name="ManageEvents" component={ManageEventsScreen} />
           <Stack.Screen name="EditEvent" component={EditEventScreen} />
+          <Stack.Screen name="ManageFriends" component={ManageFriendsScreen} />
+          <Stack.Screen name="SearchFriends" component={SearchFriendsScreen} />
+          <Stack.Screen name="SearchForMatch" component={SearchForMatchScreen} />
+
 
         </Stack.Navigator>
       </NavigationContainer>

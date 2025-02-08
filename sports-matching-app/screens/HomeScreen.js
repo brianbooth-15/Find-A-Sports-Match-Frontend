@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import { FontAwesome5 } from "@expo/vector-icons"; // Import icons
 
 export default function HomeScreen() {
   const user = auth.currentUser;
@@ -15,7 +16,7 @@ export default function HomeScreen() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigation.replace("Login"); // Redirect to Login screen
+      navigation.replace("Login"); 
     } catch (error) {
       Alert.alert("Error", "Failed to log out");
     }
@@ -23,19 +24,38 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Profile Header */}
       <View style={styles.header}>
+        <FontAwesome5 name="user-circle" size={50} color="white" />
         <Text style={styles.title}>Welcome, {user.email}</Text>
       </View>
 
-      <View style={styles.optionsContainer}>
-        <Button title="Configure Profile" onPress={() => navigation.navigate("Profile")} />
-        <Button title="Search for Match" onPress={() => Alert.alert("Search Match Clicked")} />
-        {/* <Button title="Create Event" onPress={() => navigation.navigate("CreateEvent")} /> Update to navigate to CreateEvent */}
-        <Button title="Manage Events" onPress={() => navigation.navigate("ManageEvents")} />
+      {/* Options */}
+      <TouchableOpacity style={styles.optionCard} onPress={() => navigation.navigate("Profile")}>
+        <FontAwesome5 name="user-edit" size={20} color="#007AFF" />
+        <Text style={styles.optionText}>Configure Profile</Text>
+      </TouchableOpacity>
 
-      </View>
+      <TouchableOpacity style={styles.optionCard} onPress={() => navigation.navigate("SearchForMatch")}>
+        <FontAwesome5 name="search" size={20} color="#007AFF" />
+        <Text style={styles.optionText}>Search for Match</Text>
+      </TouchableOpacity>
 
-      <Button title="Logout" onPress={handleLogout} color="red" />
+      <TouchableOpacity style={styles.optionCard} onPress={() => navigation.navigate("ManageEvents")}>
+        <FontAwesome5 name="calendar-alt" size={20} color="#007AFF" />
+        <Text style={styles.optionText}>Manage Events</Text>
+      </TouchableOpacity>
+
+      {/* New Manage Friends Option */}
+      <TouchableOpacity style={styles.optionCard} onPress={() => navigation.navigate("ManageFriends")}>
+        <FontAwesome5 name="users" size={20} color="#007AFF" />
+        <Text style={styles.optionText}>Manage Friends</Text>
+      </TouchableOpacity>
+
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -47,9 +67,26 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     marginBottom: 30,
+    borderRadius: 10,
   },
-  title: { fontSize: 22, color: "white", fontWeight: "bold" },
-  optionsContainer: {
-    marginBottom: 20,
+  title: { fontSize: 22, color: "white", fontWeight: "bold", marginTop: 10 },
+  optionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
+  optionText: { fontSize: 16, marginLeft: 10, color: "#007AFF" },
+  logoutButton: {
+    backgroundColor: "red",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  logoutText: { color: "white", fontSize: 16, fontWeight: "bold" },
 });
