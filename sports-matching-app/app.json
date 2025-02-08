@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "sports-matching-app",
+    "slug": "sports-matching-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "firebaseApiKey": "AIzaSyBcUSKVHtV4e4IKRz2GdoDeOOLk8aACDXY",
+      "firebaseAuthDomain": "findasportsmatch.firebaseapp.com",
+      "firebaseProjectId": "findasportsmatch",
+      "firebaseStorageBucket": "findasportsmatch.appspot.com",
+      "firebaseMessagingSenderId": "713000703841",
+      "firebaseAppId": "1:713000703841:web:39753bb85d115246a5d720",
+      "firebaseMeasurementId": "G-SX6YYH05EY"
+    }
+  }
+}
