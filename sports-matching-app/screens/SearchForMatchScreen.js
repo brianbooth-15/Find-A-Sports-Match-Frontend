@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import Swiper from 'react-native-deck-swiper';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Swiper from 'react-native-swipeable-cards';
 
 const initialEvents = [
   {
@@ -37,13 +37,14 @@ export default function SearchForMatchScreen({ navigation }) {
 
   const handleSwipe = (cardIndex, action) => {
     const event = initialEvents[cardIndex];
+
     if (action === 'right') {
-      // User swiped right
-      Alert.alert("Interested!", `You are interested in ${event.sport} hosted by ${event.postedBy}`);
+      // User swiped right (Interested)
       setSwiped([...swiped, event]);
+      console.log(`Interested in: ${event.sport} hosted by ${event.postedBy}`);
     } else {
-      // User swiped left
-      Alert.alert("Not Interested", `You passed on ${event.sport}`);
+      // User swiped left (Not Interested)
+      console.log(`Passed on: ${event.sport}`);
     }
   };
 
@@ -124,3 +125,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+

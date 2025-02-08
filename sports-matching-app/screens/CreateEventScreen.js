@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { 
   View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, 
-  KeyboardAvoidingView, Platform 
+  Platform 
 } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Slider from "@react-native-community/slider";
 import moment from "moment";
+
+// Conditionally import KeyboardAvoidingView only for mobile
+const KeyboardAvoidingView = Platform.OS === "ios" || Platform.OS === "android" 
+  ? require("react-native").KeyboardAvoidingView 
+  : View;
 
 const sportsList = [
   "Walking (for fitness)", "Swimming", "Football (Soccer)", "Cycling", 
@@ -25,7 +30,7 @@ export default function CreateEventScreen({ navigation }) {
   const [endTime, setEndTime] = useState("");
   const [numParticipants, setNumParticipants] = useState("");
   const [selectedGender, setSelectedGender] = useState("Both");
-  const [cost, setCost] = useState(0); // Default to Free (£0)
+  const [cost, setCost] = useState(0);
 
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isStartTimePickerVisible, setStartTimePickerVisible] = useState(false);
@@ -153,29 +158,10 @@ export default function CreateEventScreen({ navigation }) {
         <Button title="Save Event" onPress={handleSaveEvent} />
       </ScrollView>
 
-      {/* Date Picker Modal */}
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleDateConfirm}
-        onCancel={hideDatePicker}
-      />
-
-      {/* Start Time Picker Modal */}
-      <DateTimePickerModal
-        isVisible={isStartTimePickerVisible}
-        mode="time"
-        onConfirm={handleStartTimeConfirm}
-        onCancel={hideStartTimePicker}
-      />
-
-      {/* End Time Picker Modal */}
-      <DateTimePickerModal
-        isVisible={isEndTimePickerVisible}
-        mode="time"
-        onConfirm={handleEndTimeConfirm}
-        onCancel={hideEndTimePicker}
-      />
+      {/* Date Picker Modals */}
+      <DateTimePickerModal isVisible={isDatePickerVisible} mode="date" onConfirm={handleDateConfirm} onCancel={hideDatePicker} />
+      <DateTimePickerModal isVisible={isStartTimePickerVisible} mode="time" onConfirm={handleStartTimeConfirm} onCancel={hideStartTimePicker} />
+      <DateTimePickerModal isVisible={isEndTimePickerVisible} mode="time" onConfirm={handleEndTimeConfirm} onCancel={hideEndTimePicker} />
     </KeyboardAvoidingView>
   );
 }
@@ -243,4 +229,3 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
-

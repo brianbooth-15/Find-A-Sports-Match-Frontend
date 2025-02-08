@@ -7,6 +7,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebaseConfig"; // Import Firebase auth
+import { firestore } from './firebaseConfig'; // Assuming you use Firestore for storing user profiles
 
 import EditEventScreen from "./screens/EditEventScreen"; // Import the new screen
 import ManageEventsScreen from "./screens/ManageEventsScreen"; // Import the new screen
@@ -17,7 +18,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import CreateEventScreen from "./screens/CreateEventScreen"; // Import the CreateEvent screen
 import HomeScreen from "./screens/HomeScreen";
 import ManageFriendsScreen from "./screens/ManageFriendsScreen"; // ✅ Add this import
-import SearchFriendsScreen from "./screens/SearchFriendsScreen"; // ✅ Add this impor
+import SearchFriendsScreen from "./screens/SearchFriendsScreen"; // ✅ Add this import
 
 const Stack = createStackNavigator();
 
@@ -27,22 +28,38 @@ export default function App() {
 
   // Check authentication status when app loads
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user); // Set auth state based on user presence
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Check if profile is complete in Firestore
+        const userProfileRef = firestore.collection("users").doc(user.uid);
+        const doc = await userProfileRef.get();
+        const isProfileComplete = doc.exists && doc.data().profileComplete; // Assuming you store profileComplete as a field
+
+        if (isProfileComplete) {
+          setIsAuthenticated(true);
+          navigation.navigate('Home'); // Navigate to Home if profile is complete
+        } else {
+          setIsAuthenticated(true);
+          navigation.navigate('Profile'); // Navigate to Profile if profile is incomplete
+        }
+      } else {
+        setIsAuthenticated(false);
+        navigation.navigate('Login'); // Redirect to Login if not authenticated
+      }
       setIsLoading(false); // Stop loading once check is complete
     });
 
     return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
-  // Show loading spinner while checking authentication status
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </View>
-    );
-  }
+  // // Show loading spinner while checking authentication status
+  // if (isLoading) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+  //       <ActivityIndicator size="large" color="#007AFF" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -63,8 +80,6 @@ export default function App() {
           <Stack.Screen name="ManageFriends" component={ManageFriendsScreen} />
           <Stack.Screen name="SearchFriends" component={SearchFriendsScreen} />
           <Stack.Screen name="SearchForMatch" component={SearchForMatchScreen} />
-
-
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

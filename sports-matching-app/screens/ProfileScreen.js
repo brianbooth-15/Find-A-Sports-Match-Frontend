@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity 
 } from "react-native";
-import MapView, { Marker, Circle } from "react-native-maps";
+import { Platform } from 'react-native'; // Import Platform API
 import * as Location from "expo-location";
 import Slider from "@react-native-community/slider";
 
@@ -23,8 +23,8 @@ export default function ProfileScreen({ navigation }) {
   const [selectedSports, setSelectedSports] = useState({});
   const [radius, setRadius] = useState(10);
   const [location, setLocation] = useState(null);
-  const [mapHeight, setMapHeight] = useState(300);
 
+  // Remove map and location logic for now
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -95,11 +95,6 @@ export default function ProfileScreen({ navigation }) {
     }));
   };
 
-  // Handle map tap
-  const handleMapPress = (event) => {
-    setLocation(event.nativeEvent.coordinate);
-  };
-
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
@@ -144,32 +139,6 @@ export default function ProfileScreen({ navigation }) {
             maximumTrackTintColor="#ccc"
             thumbTintColor="#007AFF"
           />
-        </View>
-
-        <Text style={styles.subHeader}>Set Your Location</Text>
-        <View style={[styles.mapContainer, { height: mapHeight }]}>
-          {location ? (
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: location.latitude,
-                longitude: location.longitude,
-                latitudeDelta: 0.1,
-                longitudeDelta: 0.1,
-              }}
-              onPress={handleMapPress}
-            >
-              <Marker coordinate={location} title="Your Location" />
-              <Circle
-                center={location}
-                radius={radius * 1000}
-                strokeColor="rgba(0, 122, 255, 0.5)"
-                fillColor="rgba(0, 122, 255, 0.2)"
-              />
-            </MapView>
-          ) : (
-            <Text>Loading Map...</Text>
-          )}
         </View>
 
         <Text style={styles.subHeader}>Select Your Sports & Preferences</Text>
