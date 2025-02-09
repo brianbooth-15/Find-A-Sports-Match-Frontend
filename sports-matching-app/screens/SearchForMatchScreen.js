@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Swiper from 'react-native-swipeable-cards';
+// import Swiper from 'react-native-swipeable-cards';
 
 const initialEvents = [
   {
@@ -66,7 +66,7 @@ export default function SearchForMatchScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Swiper
+      {/* <Swiper
         cards={initialEvents}
         renderCard={renderCard}
         onSwiped={(cardIndex) => handleSwipe(cardIndex, 'left')}
@@ -98,7 +98,7 @@ export default function SearchForMatchScreen({ navigation }) {
             },
           },
         }}
-      />
+      /> */}
     </View>
   );
 }

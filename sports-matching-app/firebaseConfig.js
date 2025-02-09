@@ -1,9 +1,11 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
-import Constants from 'expo-constants';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';  // Import AsyncStorage for persistence
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { getReactNativePersistence } from "firebase/auth";  // For React Native persistence
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';  // For React Native
+import Constants from "expo-constants";
+import { Platform } from "react-native";  // For platform checking
 
-// Access Firebase configuration from app.json (provided through expo)
+// Firebase Config
 const firebaseConfig = {
   apiKey: Constants.expoConfig?.extra?.firebaseApiKey,
   authDomain: Constants.expoConfig?.extra?.firebaseAuthDomain,
@@ -14,17 +16,23 @@ const firebaseConfig = {
   measurementId: Constants.expoConfig?.extra?.firebaseMeasurementId,
 };
 
-// Check if required config is available, if not, log an error
-if (!firebaseConfig.apiKey) {
-  console.error("Firebase configuration is missing!");
-}
-
-// Initialize Firebase (even if some fields are missing, you can still proceed with the available ones)
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Authentication with AsyncStorage for persistence
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage) // This ensures persistence
-});
+// Initialize Firebase Auth
+const auth = getAuth(app);
+
+// Check platform and set persistence accordingly
+if (Platform.OS === 'web') {
+  // For Web, use browserLocalPersistence
+  setPersistence(auth, browserLocalPersistence).catch((error) => {
+    console.error("Error setting persistence for web:", error);
+  });
+} else {
+  // For React Native, use AsyncStorage for persistence
+  setPersistence(auth, getReactNativePersistence(ReactNativeAsyncStorage)).catch((error) => {
+    console.error("Error setting persistence for React Native:", error);
+  });
+}
 
 export { app, auth };

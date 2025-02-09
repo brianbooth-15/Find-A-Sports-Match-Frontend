@@ -4,8 +4,7 @@ import {
   Platform 
 } from "react-native";
 import { Picker } from '@react-native-picker/picker';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import Slider from "@react-native-community/slider";
+// import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 
 // Conditionally import KeyboardAvoidingView only for mobile
@@ -142,7 +141,7 @@ export default function CreateEventScreen({ navigation }) {
         {/* Cost Selection */}
         <Text style={styles.label}>Event Cost (£)</Text>
         <Text style={styles.costValue}>£{cost}</Text>
-        <Slider
+        {/* <Slider
           style={styles.slider}
           minimumValue={0}
           maximumValue={200}
@@ -152,16 +151,16 @@ export default function CreateEventScreen({ navigation }) {
           minimumTrackTintColor="#007AFF"
           maximumTrackTintColor="#ddd"
           thumbTintColor="#007AFF"
-        />
+        /> */}
 
         {/* Save Event Button */}
         <Button title="Save Event" onPress={handleSaveEvent} />
       </ScrollView>
 
       {/* Date Picker Modals */}
-      <DateTimePickerModal isVisible={isDatePickerVisible} mode="date" onConfirm={handleDateConfirm} onCancel={hideDatePicker} />
+      {/* <DateTimePickerModal isVisible={isDatePickerVisible} mode="date" onConfirm={handleDateConfirm} onCancel={hideDatePicker} />
       <DateTimePickerModal isVisible={isStartTimePickerVisible} mode="time" onConfirm={handleStartTimeConfirm} onCancel={hideStartTimePicker} />
-      <DateTimePickerModal isVisible={isEndTimePickerVisible} mode="time" onConfirm={handleEndTimeConfirm} onCancel={hideEndTimePicker} />
+      <DateTimePickerModal isVisible={isEndTimePickerVisible} mode="time" onConfirm={handleEndTimeConfirm} onCancel={hideEndTimePicker} /> */}
     </KeyboardAvoidingView>
   );
 }
@@ -224,8 +223,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-  slider: {
-    width: "100%",
-    height: 40,
-  },
+  // slider: {
+  //   width: "100%",
+  //   height: 40,
+  // },
 });

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, ScrollView } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import Slider from "@react-native-community/slider";
+// import Slider from "@react-native-community/slider";
 
 export default function EditEventScreen({ route, navigation }) {
   const { event } = route.params; // Get event data
@@ -70,7 +70,7 @@ export default function EditEventScreen({ route, navigation }) {
       {/* Cost Selection */}
       <Text style={styles.label}>Event Cost (£)</Text>
       <Text style={styles.costValue}>£{cost}</Text>
-      <Slider
+      {/* <Slider
         style={styles.slider}
         minimumValue={0}
         maximumValue={200}
@@ -80,7 +80,7 @@ export default function EditEventScreen({ route, navigation }) {
         minimumTrackTintColor="#007AFF"
         maximumTrackTintColor="#ddd"
         thumbTintColor="#007AFF"
-      />
+      /> */}
 
       {/* Save Changes Button */}
       <Button title="Save Changes" onPress={handleSaveChanges} />
@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
   picker: { height: 50, marginBottom: 10 },
   input: { borderWidth: 1, padding: 10, fontSize: 16, marginBottom: 10 },
   costValue: { fontSize: 18, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
-  slider: { width: "100%", height: 40 },
+  // slider: { width: "100%", height: 40 },
 });
 
