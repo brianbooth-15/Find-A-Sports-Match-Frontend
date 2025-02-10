@@ -1,21 +1,33 @@
-# Use a Node.js base image (LTS version)
-FROM node:16
+# Step 1: Use Node 20 to build the app
+FROM node:20-alpine AS build
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if exists)
-COPY package*.json ./
+# Install dependencies properly
+COPY package.json package-lock.json ./
+RUN rm -rf node_modules package-lock.json && npm install
 
-# Install dependencies
-RUN npm install -g expo-cli
-RUN npm install
+# Debug: Check if web-streams-polyfill is installed
+RUN ls node_modules | grep web-streams-polyfill
 
-# Copy the rest of your application files
+# Copy the entire source code into the container
 COPY . .
 
-# Expose the port for Expo's development server
-EXPOSE 19000
+# Debugging step: List files in the /app directory (can be removed after confirming)
+RUN echo "Listing all files in /app:" && ls -alh /app
 
-# Start Expo in the container
-CMD ["expo", "start", "--tunnel"]
+# Build the web app (corrected command)
+RUN npx expo export
+
+# Step 2: Use Nginx to serve the static files
+FROM nginx:alpine
+
+# Copy the correct build directory
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port 80 for serving the app
+EXPOSE 80
+
+# Start Nginx to serve the app
+CMD ["nginx", "-g", "daemon off;"]

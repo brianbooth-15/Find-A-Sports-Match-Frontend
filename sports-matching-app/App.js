@@ -1,11 +1,38 @@
+// At the top of your App.js file
+import './polyfill';  // Import polyfill.js
 
-import "web-streams-polyfill"; // Add polyfill for React Native fetch issues
+// Polyfill for util.promisify
+if (typeof util === 'undefined') {
+  global.util = require('util');  // Polyfill for `util.promisify`
+}
+
+if (typeof util.promisify === 'undefined') {
+  global.util.promisify = function(fn) {
+    return function(...args) {
+      return new Promise((resolve, reject) => {
+        fn(...args, (err, result) => {
+          if (err) reject(err);
+          else resolve(result);
+        });
+      });
+    };
+  };
+}
+
+
+
+
+// Import polyfill for web streams
+import "web-streams-polyfill";
+
+// Importing other necessary libraries for your React Native application
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { onAuthStateChanged } from "firebase/auth"; // Only import authentication methods
 import { auth } from "./firebaseConfig";  // Import Firebase auth
+
 
 import EditEventScreen from "./screens/EditEventScreen";
 import ManageEventsScreen from "./screens/ManageEventsScreen";
