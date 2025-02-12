@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Dimensions, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import LayoutContainer from './LayoutContainer';
+
+// Get screen width and height
+const { width, height } = Dimensions.get('window');
+
+// Determine if the platform is web or mobile
+const isWeb = Platform.OS === 'web';
+
+const minWidth = isWeb ? 320 : width * 1;
 
 const initialFriendRequests = [
   { id: "1", firstName: "John", lastName: "Doe", photo: "👤" },
@@ -45,6 +54,7 @@ export default function ManageFriendsScreen() {
   );
 
   return (
+    <LayoutContainer>
     <View style={styles.container}>
       <View style={styles.tabs}>
         <TouchableOpacity style={[styles.tab, tab === "friends" && styles.activeTab]} onPress={() => setTab("friends")}>
@@ -65,11 +75,12 @@ export default function ManageFriendsScreen() {
         <Text style={styles.buttonText}>Search Friends</Text>
       </TouchableOpacity>
     </View>
+    </LayoutContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9" },
+  container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9", minWidth: minWidth },
   tabs: { flexDirection: "row", marginBottom: 15 },
   tab: { flex: 1, padding: 10, alignItems: "center", borderBottomWidth: 2, borderBottomColor: "#ddd" },
   activeTab: { borderBottomColor: "#007AFF" },

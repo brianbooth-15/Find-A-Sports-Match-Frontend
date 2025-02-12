@@ -3,6 +3,15 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, Platform, 
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";  // Ensure the correct path
 import { useNavigation } from "@react-navigation/native";
+import LayoutContainer from './LayoutContainer';
+
+// Get screen width and height
+const { width, height } = Dimensions.get('window');
+
+// Determine if the platform is web or mobile
+const isWeb = Platform.OS === 'web';
+
+const minContainerWidth = isWeb ? 320 : width * 1;
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -61,6 +70,7 @@ export default function LoginScreen() {
   };
 
   return (
+    <LayoutContainer>
     <View style={styles.container}>
       {/* App Name */}
       <Text style={styles.appName}>Find A Sports Match</Text>
@@ -105,6 +115,7 @@ export default function LoginScreen() {
         Don't have an account? Sign Up
       </Text>
     </View>
+    </LayoutContainer>
   );
 }
 
@@ -114,8 +125,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
     backgroundColor: "#f9f9f9",
-    maxWidth: 400,  // Max width for larger screens, e.g., web
     alignSelf: "center",  // Center the content
+    minWidth: minContainerWidth,
   },
   appName: {
     fontSize: 30,

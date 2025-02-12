@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { FontAwesome5 } from "@expo/vector-icons"; // Import icons
+import LayoutContainer from './LayoutContainer';
 
 export default function HomeScreen() {
   const user = auth.currentUser;
@@ -23,6 +24,7 @@ export default function HomeScreen() {
   };
 
   return (
+    <LayoutContainer>
     <View style={styles.container}>
       {/* Profile Header */}
       <View style={styles.header}>
@@ -57,6 +59,7 @@ export default function HomeScreen() {
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>
+    </LayoutContainer>
   );
 }
 

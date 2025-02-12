@@ -1,4 +1,3 @@
-// At the top of your App.js file
 import './polyfill';  // Import polyfill.js
 
 // Polyfill for util.promisify
@@ -19,15 +18,12 @@ if (typeof util.promisify === 'undefined') {
   };
 }
 
-
-
-
 // Import polyfill for web streams
 import "web-streams-polyfill";
 
 // Importing other necessary libraries for your React Native application
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { onAuthStateChanged } from "firebase/auth"; // Only import authentication methods
@@ -45,9 +41,30 @@ import HomeScreen from "./screens/HomeScreen";
 import ManageFriendsScreen from "./screens/ManageFriendsScreen";
 import SearchFriendsScreen from "./screens/SearchFriendsScreen";
 
+if (Platform.OS === 'web') {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    html, body {
+      height: 100%;
+      overflow: auto; /* Allow scrolling on web */
+      margin: 0; /* Remove default margin */
+      overflow-x: hidden; /* Prevent horizontal overflow */
+    }
+
+    #root {
+      display: flex;
+      height: 100%;
+      flex: 1;
+      overflow-y: scroll; /* Ensure vertical scroll is available */
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+
+
+
 const Stack = createStackNavigator();
-
-
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // `null` initially to avoid unnecessary renders

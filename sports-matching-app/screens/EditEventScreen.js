@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Dimensions, Platform } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 // import Slider from "@react-native-community/slider";
+
+import LayoutContainer from './LayoutContainer';
+
+// Get screen width and height
+const { width, height } = Dimensions.get('window');
+
+// Determine if the platform is web or mobile
+const isWeb = Platform.OS === 'web';
+
+const minWidth = isWeb ? 320 : width * 1;
 
 export default function EditEventScreen({ route, navigation }) {
   const { event } = route.params; // Get event data
@@ -24,6 +34,7 @@ export default function EditEventScreen({ route, navigation }) {
   };
 
   return (
+    <LayoutContainer>
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Edit Event</Text>
 
@@ -85,11 +96,12 @@ export default function EditEventScreen({ route, navigation }) {
       {/* Save Changes Button */}
       <Button title="Save Changes" onPress={handleSaveChanges} />
     </ScrollView>
+    </LayoutContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
+  container: { padding: 20, minWidth: minWidth },
   header: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
   label: { fontSize: 16, fontWeight: "bold", marginTop: 10 },
   picker: { height: 50, marginBottom: 10 },

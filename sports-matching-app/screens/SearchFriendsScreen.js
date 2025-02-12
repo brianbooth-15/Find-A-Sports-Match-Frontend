@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Dimensions, Platform } from "react-native";
+import LayoutContainer from './LayoutContainer';
+
+// Get screen width and height
+const { width, height } = Dimensions.get('window');
+
+// Determine if the platform is web or mobile
+const isWeb = Platform.OS === 'web';
+
+const minWidth = isWeb ? 320 : width * 1;
 
 // Dummy friend list
 const dummyFriends = [
@@ -27,6 +36,7 @@ export default function SearchFriendsScreen({ navigation }) {
   };
 
   return (
+    <LayoutContainer>
     <View style={styles.container}>
       <Text style={styles.header}>Search Friends</Text>
 
@@ -52,12 +62,13 @@ export default function SearchFriendsScreen({ navigation }) {
         )}
       />
     </View>
+    </LayoutContainer>
   );
 }
 
 // Styles
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9" },
+  container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9", minWidth: minWidth },
   header: { fontSize: 24, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
   searchInput: {
     height: 40,

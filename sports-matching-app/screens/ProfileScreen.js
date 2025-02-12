@@ -1,27 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { Platform } from "react-native"; // Import Platform API
+import { View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import * as Location from "expo-location";
+import LayoutContainer from './LayoutContainer';
 
 const sportsList = [
-  "Walking (for fitness)",
-  "Swimming",
-  "Football (Soccer)",
-  "Cycling",
-  "Running/Jogging",
-  "Golf",
-  "Tennis",
-  "Badminton",
-  "Rugby (Union & League)",
-  "Basketball",
+  "Walking (for fitness)", "Swimming", "Football (Soccer)", "Cycling",
+  "Running/Jogging", "Golf", "Tennis", "Badminton", "Rugby (Union & League)", "Basketball",
 ];
 
 const skillLevels = ["Beginner", "Intermediate", "Advanced"];
@@ -104,95 +88,95 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.header}>Create Your Profile</Text>
-
-        <TextInput style={styles.input} placeholder="Your Name" value={name} onChangeText={setName} />
-
-        <View style={styles.dobContainer}>
-          <TextInput
-            style={[styles.input, styles.dobInput]}
-            placeholder="DD/MM/YYYY"
-            value={dob}
-            onChangeText={handleDobChange}
-            keyboardType="numeric"
-            maxLength={10}
-          />
-          {age !== null && <Text style={styles.ageText}>Age: {age}</Text>}
-        </View>
-
-        <TextInput style={styles.input} placeholder="Availability (e.g. Friday 7-8PM)" value={availability} onChangeText={setAvailability} />
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Search Radius: {radius} km</Text>
-        </View>
-
-        <Text style={styles.subHeader}>Select Your Sports & Preferences</Text>
-        {sportsList.map((sport) => (
-          <View key={sport} style={styles.sportItem}>
-            <TouchableOpacity
-              style={[styles.sportButton, selectedSports[sport] && styles.sportButtonSelected]}
-              onPress={() => toggleSport(sport)}
-            >
-              <Text style={[styles.sportText, selectedSports[sport] && styles.sportTextSelected]}>
-                {sport} {selectedSports[sport] ? `(${selectedSports[sport].level})` : ""}
-              </Text>
-            </TouchableOpacity>
-
-            {selectedSports[sport] && (
-              <>
-                <View style={styles.skillContainer}>
-                  {skillLevels.map((level) => (
-                    <TouchableOpacity
-                      key={level}
-                      style={[
-                        styles.skillButton,
-                        selectedSports[sport].level === level && styles.skillButtonSelected,
-                      ]}
-                      onPress={() => updateSkillLevel(sport, level)}
-                    >
-                      <Text
-                        style={[
-                          styles.skillText,
-                          selectedSports[sport].level === level && styles.skillTextSelected,
-                        ]}
-                      >
-                        {level}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                <View style={styles.genderContainer}>
-                  {genderOptions.map((gender) => (
-                    <TouchableOpacity
-                      key={gender}
-                      style={[
-                        styles.genderButton,
-                        selectedSports[sport].gender === gender && styles.genderButtonSelected,
-                      ]}
-                      onPress={() => updateGenderPreference(sport, gender)}
-                    >
-                      <Text
-                        style={[
-                          styles.genderText,
-                          selectedSports[sport].gender === gender && styles.genderTextSelected,
-                        ]}
-                      >
-                        {gender}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </>
-            )}
+    <LayoutContainer>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.header}>Create Your Profile</Text>
+          <TextInput style={styles.input} placeholder="Your Name" value={name} onChangeText={setName} />
+          <View style={styles.dobContainer}>
+            <TextInput
+              style={[styles.input, styles.dobInput]}
+              placeholder="DD/MM/YYYY"
+              value={dob}
+              onChangeText={handleDobChange}
+              keyboardType="numeric"
+              maxLength={10}
+            />
+            {age !== null && <Text style={styles.ageText}>Age: {age}</Text>}
           </View>
-        ))}
 
-        <Button title="Save & Continue" onPress={() => navigation.navigate("Home")} />
-      </View>
-    </ScrollView>
+          <TextInput style={styles.input} placeholder="Availability (e.g. Friday 7-8PM)" value={availability} onChangeText={setAvailability} />
+
+          <View style={styles.section}>
+            <Text style={styles.label}>Search Radius: {radius} km</Text>
+          </View>
+
+          <Text style={styles.subHeader}>Select Your Sports & Preferences</Text>
+          {sportsList.map((sport) => (
+            <View key={sport} style={styles.sportItem}>
+              <TouchableOpacity
+                style={[styles.sportButton, selectedSports[sport] && styles.sportButtonSelected]}
+                onPress={() => toggleSport(sport)}
+              >
+                <Text style={[styles.sportText, selectedSports[sport] && styles.sportTextSelected]}>
+                  {sport} {selectedSports[sport] ? `(${selectedSports[sport].level})` : ""}
+                </Text>
+              </TouchableOpacity>
+
+              {selectedSports[sport] && (
+                <>
+                  <View style={styles.skillContainer}>
+                    {skillLevels.map((level) => (
+                      <TouchableOpacity
+                        key={level}
+                        style={[
+                          styles.skillButton,
+                          selectedSports[sport].level === level && styles.skillButtonSelected,
+                        ]}
+                        onPress={() => updateSkillLevel(sport, level)}
+                      >
+                        <Text
+                          style={[
+                            styles.skillText,
+                            selectedSports[sport].level === level && styles.skillTextSelected,
+                          ]}
+                        >
+                          {level}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <View style={styles.genderContainer}>
+                    {genderOptions.map((gender) => (
+                      <TouchableOpacity
+                        key={gender}
+                        style={[
+                          styles.genderButton,
+                          selectedSports[sport].gender === gender && styles.genderButtonSelected,
+                        ]}
+                        onPress={() => updateGenderPreference(sport, gender)}
+                      >
+                        <Text
+                          style={[
+                            styles.genderText,
+                            selectedSports[sport].gender === gender && styles.genderTextSelected,
+                          ]}
+                        >
+                          {gender}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              )}
+            </View>
+          ))}
+
+          <Button title="Save & Continue" onPress={() => navigation.navigate("Home")} />
+        </View>
+      </ScrollView>
+    </LayoutContainer>
   );
 }
 
@@ -205,8 +189,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    minHeight: "100vh", // Ensure scrollable content
-    overflowY: "auto",  // Allow scrolling
+    overflowY: 'auto', // Ensure scrolling is enabled
   },
   header: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
   subHeader: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
@@ -237,4 +220,3 @@ const styles = StyleSheet.create({
   genderText: { fontSize: 14, color: "#FF9500", fontWeight: "bold" },
   genderTextSelected: { color: "white" },
 });
-

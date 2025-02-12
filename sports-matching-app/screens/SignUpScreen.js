@@ -1,8 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, Dimensions, Platform } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig"; // Ensure the correct path to firebaseConfig
 import { useNavigation } from "@react-navigation/native";
+
+import LayoutContainer from './LayoutContainer';
+
+// Get screen width and height
+const { width, height } = Dimensions.get('window');
+
+// Determine if the platform is web or mobile
+const isWeb = Platform.OS === 'web';
+
+const minWidth = isWeb ? 320 : width * 1;
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState("");
@@ -32,6 +42,7 @@ export default function SignUpScreen() {
   };
 
   return (
+    <LayoutContainer>
     <View style={styles.container}>
       <Text style={styles.header}>Sign Up</Text>
 
@@ -69,6 +80,7 @@ export default function SignUpScreen() {
         Already have an account? Login
       </Text>
     </View>
+    </LayoutContainer>
   );
 }
 
@@ -76,6 +88,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    minWidth: minWidth,
     padding: 20,
     backgroundColor: "#f9f9f9",
   },
