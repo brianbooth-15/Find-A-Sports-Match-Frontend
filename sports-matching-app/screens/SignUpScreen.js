@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert, Dimensions, Platform } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebaseConfig"; // Ensure the correct path to firebaseConfig
 import { useNavigation } from "@react-navigation/native";
-
 import LayoutContainer from './LayoutContainer';
 
 // Get screen width and height
@@ -23,19 +20,44 @@ export default function SignUpScreen() {
 
   // Handle Sign Up
   const handleSignUp = async () => {
+    console.log("Signing up with email:", email);
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match.");
       return;
     }
+    console.log("Passwords match!");
 
     setIsLoading(true);
 
+    const payload = {
+      email,
+      password,
+    };
+    console.log("Signing up with payload  ", payload);  
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert("Success", "Account created successfully!");
-      navigation.navigate("Login"); // Navigate back to Login screen
+      console.log("Signing up with payload:", payload);
+      // Send the sign-up request to your Lambda function
+      const response = await fetch("https://hg14rciwsd.execute-api.eu-west-1.amazonaws.com/dev/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      console.log("Response:", response);
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Success", data.message);
+        navigation.navigate("Login"); // Navigate to Login screen on success
+      } else {
+        Alert.alert("Error", data.message || "An error occurred while signing up.");
+      }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      console.error("Error signing up:", error.message);
+      Alert.alert("Error", "An unknown error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -43,43 +65,43 @@ export default function SignUpScreen() {
 
   return (
     <LayoutContainer>
-    <View style={styles.container}>
-      <Text style={styles.header}>Sign Up</Text>
+      <View style={styles.container}>
+        <Text style={styles.header}>Sign Up</Text>
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        placeholder="Enter your email"
-        autoCapitalize="none"
-      />
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          placeholder="Enter your email"
+          autoCapitalize="none"
+        />
 
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholder="Enter your password"
-      />
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholder="Enter your password"
+        />
 
-      <Text style={styles.label}>Confirm Password</Text>
-      <TextInput
-        style={styles.input}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-        placeholder="Confirm your password"
-      />
+        <Text style={styles.label}>Confirm Password</Text>
+        <TextInput
+          style={styles.input}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+          placeholder="Confirm your password"
+        />
 
-      <Button title={isLoading ? "Creating..." : "Sign Up"} onPress={handleSignUp} disabled={isLoading} />
+        <Button title={isLoading ? "Creating..." : "Sign Up"} onPress={handleSignUp} disabled={isLoading} />
 
-      <Text style={styles.link} onPress={() => navigation.navigate("Login")}>
-        Already have an account? Login
-      </Text>
-    </View>
+        <Text style={styles.link} onPress={() => navigation.navigate("Login")}>
+          Already have an account? Login
+        </Text>
+      </View>
     </LayoutContainer>
   );
 }

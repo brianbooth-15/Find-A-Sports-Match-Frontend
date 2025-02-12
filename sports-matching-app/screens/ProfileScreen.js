@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { 
+  View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity, Alert, Dimensions, Platform
+} from "react-native";
+import * as SecureStore from "expo-secure-store"; // Securely store JWT token
 import * as Location from "expo-location";
 import LayoutContainer from './LayoutContainer';
+
+// Get screen width and height
+const { width, height } = Dimensions.get('window');
+
+// Determine if the platform is web or mobile
+const isWeb = Platform.OS === 'web';
+
+const minWidth = isWeb ? 320 : width;
+
+const API_URL = "https://u4tp9u32pc.execute-api.eu-west-1.amazonaws.com/dev/profile";
 
 const sportsList = [
   "Walking (for fitness)", "Swimming", "Football (Soccer)", "Cycling",
@@ -12,6 +25,7 @@ const skillLevels = ["Beginner", "Intermediate", "Advanced"];
 const genderOptions = ["Male", "Female", "Both"];
 
 export default function ProfileScreen({ navigation }) {
+  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [age, setAge] = useState(null);
@@ -19,32 +33,71 @@ export default function ProfileScreen({ navigation }) {
   const [selectedSports, setSelectedSports] = useState({});
   const [radius, setRadius] = useState(10);
   const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
+    fetchProfile();
+    requestLocationPermission();
+  }, []);
+
+  // Fetch Profile from AWS Lambda
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const token = await SecureStore.getItemAsync("userToken");
+      if (!token) {
+        Alert.alert("Error", "User not authenticated");
+        navigation.replace("Login");
         return;
       }
 
-      let userLocation = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: userLocation.coords.latitude,
-        longitude: userLocation.coords.longitude,
-      });
-    })();
-  }, []);
+      const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+      setEmail(decodedToken.email);
 
+      const response = await fetch(`${API_URL}/${decodedToken.email}`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      const data = await response.json();
+      if (data) {
+        setName(data.name || "");
+        setDob(data.dob || "");
+        setAvailability(data.availability || "");
+        setSelectedSports(data.selectedSports || {});
+        setRadius(data.radius || 10);
+        setLocation(data.location || null);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Request Location Permissions
+  const requestLocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission denied", "Location access is required for better matches.");
+      return;
+    }
+    let userLocation = await Location.getCurrentPositionAsync({});
+    setLocation({ latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude });
+  };
+
+  // Handle DOB Change & Calculate Age
   const handleDobChange = (input) => {
     let cleanedInput = input.replace(/\D/g, "");
-
     if (cleanedInput.length > 2 && cleanedInput.length <= 4) {
       cleanedInput = `${cleanedInput.slice(0, 2)}/${cleanedInput.slice(2)}`;
     } else if (cleanedInput.length > 4) {
       cleanedInput = `${cleanedInput.slice(0, 2)}/${cleanedInput.slice(2, 4)}/${cleanedInput.slice(4, 8)}`;
     }
-
     setDob(cleanedInput);
 
     if (cleanedInput.length === 10) {
@@ -52,24 +105,22 @@ export default function ProfileScreen({ navigation }) {
       const birthDate = new Date(year, month - 1, day);
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-
-      if (
-        today.getMonth() < birthDate.getMonth() ||
-        (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
-      ) {
+      if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) {
         calculatedAge--;
       }
-
       setAge(calculatedAge);
     } else {
       setAge(null);
     }
   };
 
+  // Handle Sport Selection
   const toggleSport = (sport) => {
     setSelectedSports((prev) => ({
       ...prev,
-      [sport]: prev[sport] ? undefined : { level: "Beginner", gender: "Both" },
+      [sport]: prev[sport]
+        ? undefined
+        : { level: "Beginner", gender: "Both" },
     }));
   };
 
@@ -87,12 +138,54 @@ export default function ProfileScreen({ navigation }) {
     }));
   };
 
+  // Save Profile to AWS Lambda
+  const saveProfile = async () => {
+    try {
+      setLoading(true);
+      const token = await SecureStore.getItemAsync("userToken");
+      if (!token) {
+        Alert.alert("Error", "User not authenticated");
+        navigation.replace("Login");
+        return;
+      }
+
+      const profileData = {
+        email, name, dob, availability, selectedSports, radius, location
+      };
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save profile");
+      }
+
+      Alert.alert("Success", "Profile saved successfully!");
+      navigation.navigate("Home");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      Alert.alert("Error", "Failed to save profile.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <LayoutContainer>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Text style={styles.header}>Create Your Profile</Text>
+
+          <Text style={styles.label}>Full Name</Text>
           <TextInput style={styles.input} placeholder="Your Name" value={name} onChangeText={setName} />
+
+          <Text style={styles.label}>Date of Birth DD/MM/YYY</Text>
           <View style={styles.dobContainer}>
             <TextInput
               style={[styles.input, styles.dobInput]}
@@ -105,19 +198,13 @@ export default function ProfileScreen({ navigation }) {
             {age !== null && <Text style={styles.ageText}>Age: {age}</Text>}
           </View>
 
-          <TextInput style={styles.input} placeholder="Availability (e.g. Friday 7-8PM)" value={availability} onChangeText={setAvailability} />
-
-          <View style={styles.section}>
-            <Text style={styles.label}>Search Radius: {radius} km</Text>
-          </View>
+          <Text style={styles.label}>Availability</Text>
+          <TextInput style={styles.input} placeholder="Availability" value={availability} onChangeText={setAvailability} />
 
           <Text style={styles.subHeader}>Select Your Sports & Preferences</Text>
           {sportsList.map((sport) => (
             <View key={sport} style={styles.sportItem}>
-              <TouchableOpacity
-                style={[styles.sportButton, selectedSports[sport] && styles.sportButtonSelected]}
-                onPress={() => toggleSport(sport)}
-              >
+              <TouchableOpacity style={[styles.sportButton, selectedSports[sport] && styles.sportButtonSelected]} onPress={() => toggleSport(sport)}>
                 <Text style={[styles.sportText, selectedSports[sport] && styles.sportTextSelected]}>
                   {sport} {selectedSports[sport] ? `(${selectedSports[sport].level})` : ""}
                 </Text>
@@ -127,44 +214,16 @@ export default function ProfileScreen({ navigation }) {
                 <>
                   <View style={styles.skillContainer}>
                     {skillLevels.map((level) => (
-                      <TouchableOpacity
-                        key={level}
-                        style={[
-                          styles.skillButton,
-                          selectedSports[sport].level === level && styles.skillButtonSelected,
-                        ]}
-                        onPress={() => updateSkillLevel(sport, level)}
-                      >
-                        <Text
-                          style={[
-                            styles.skillText,
-                            selectedSports[sport].level === level && styles.skillTextSelected,
-                          ]}
-                        >
-                          {level}
-                        </Text>
+                      <TouchableOpacity key={level} style={[styles.skillButton, selectedSports[sport].level === level && styles.skillButtonSelected]} onPress={() => updateSkillLevel(sport, level)}>
+                        <Text style={[styles.skillText, selectedSports[sport].level === level && styles.skillTextSelected]}>{level}</Text>
                       </TouchableOpacity>
                     ))}
                   </View>
 
                   <View style={styles.genderContainer}>
                     {genderOptions.map((gender) => (
-                      <TouchableOpacity
-                        key={gender}
-                        style={[
-                          styles.genderButton,
-                          selectedSports[sport].gender === gender && styles.genderButtonSelected,
-                        ]}
-                        onPress={() => updateGenderPreference(sport, gender)}
-                      >
-                        <Text
-                          style={[
-                            styles.genderText,
-                            selectedSports[sport].gender === gender && styles.genderTextSelected,
-                          ]}
-                        >
-                          {gender}
-                        </Text>
+                      <TouchableOpacity key={gender} style={[styles.genderButton, selectedSports[sport].gender === gender && styles.genderButtonSelected]} onPress={() => updateGenderPreference(sport, gender)}>
+                        <Text style={[styles.genderText, selectedSports[sport].gender === gender && styles.genderTextSelected]}>{gender}</Text>
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -173,7 +232,7 @@ export default function ProfileScreen({ navigation }) {
             </View>
           ))}
 
-          <Button title="Save & Continue" onPress={() => navigation.navigate("Home")} />
+          <Button title={loading ? "Saving..." : "Save & Continue"} onPress={saveProfile} disabled={loading} />
         </View>
       </ScrollView>
     </LayoutContainer>
@@ -186,13 +245,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     flex: 1,
     minHeight: "100vh", // Ensure full height
+    minWidth: minWidth,
   },
   scrollContainer: {
     flexGrow: 1,
     overflowY: 'auto', // Ensure scrolling is enabled
   },
-  header: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
-  subHeader: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
+  header: { 
+    fontSize: 24, 
+    fontWeight: "bold", 
+    textAlign: "center", 
+    marginBottom: 20 
+  },
+  subHeader: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    marginVertical: 10 
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -202,21 +271,77 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginBottom: 15,
   },
-  dobContainer: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
+  dobContainer: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 15 
+  },
   dobInput: { flex: 1 },
-  ageText: { fontSize: 16, fontWeight: "bold", marginLeft: 10, color: "#007AFF" },
+  ageText: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    marginLeft: 10, 
+    color: "#007AFF" 
+  },
   sportItem: { marginBottom: 10 },
-  sportButton: { padding: 10, borderWidth: 1, borderColor: "#ccc", borderRadius: 5, backgroundColor: "#eee", marginBottom: 5 },
-  sportButtonSelected: { backgroundColor: "#007AFF" },
-  sportTextSelected: { color: "white", fontWeight: "bold" },
-  skillContainer: { flexDirection: "row", justifyContent: "space-around", marginTop: 5 },
-  skillButton: { padding: 5, borderWidth: 1, borderColor: "#007AFF", borderRadius: 5 },
-  skillButtonSelected: { backgroundColor: "#007AFF" },
-  skillText: { fontSize: 14, color: "#007AFF", fontWeight: "bold" },
-  skillTextSelected: { color: "white", fontWeight: "bold" },
-  genderContainer: { flexDirection: "row", justifyContent: "space-around", marginTop: 5 },
-  genderButton: { padding: 5, borderWidth: 1, borderColor: "#FF9500", borderRadius: 5 },
-  genderButtonSelected: { backgroundColor: "#FF9500" },
-  genderText: { fontSize: 14, color: "#FF9500", fontWeight: "bold" },
-  genderTextSelected: { color: "white" },
+  sportButton: { 
+    padding: 10, 
+    borderWidth: 1, 
+    borderColor: "#ccc", 
+    borderRadius: 5, 
+    backgroundColor: "#eee", 
+    marginBottom: 5 
+  },
+  sportButtonSelected: { 
+    backgroundColor: "#007AFF" 
+  },
+  sportTextSelected: { 
+    color: "white", 
+    fontWeight: "bold" 
+  },
+  skillContainer: { 
+    flexDirection: "row", 
+    justifyContent: "space-around", 
+    marginTop: 5 
+  },
+  skillButton: { 
+    padding: 5, 
+    borderWidth: 1, 
+    borderColor: "#007AFF", 
+    borderRadius: 5 
+  },
+  skillButtonSelected: { 
+    backgroundColor: "#007AFF" 
+  },
+  skillText: { 
+    fontSize: 14, 
+    color: "#007AFF", 
+    fontWeight: "bold" 
+  },
+  skillTextSelected: { 
+    color: "white", 
+    fontWeight: "bold" 
+  },
+  genderContainer: { 
+    flexDirection: "row", 
+    justifyContent: "space-around", 
+    marginTop: 5 
+  },
+  genderButton: { 
+    padding: 5, 
+    borderWidth: 1, 
+    borderColor: "#FF9500", 
+    borderRadius: 5 
+  },
+  genderButtonSelected: { 
+    backgroundColor: "#FF9500" 
+  },
+  genderText: { 
+    fontSize: 14, 
+    color: "#FF9500", 
+    fontWeight: "bold" 
+  },
+  genderTextSelected: { 
+    color: "white" 
+  },
 });

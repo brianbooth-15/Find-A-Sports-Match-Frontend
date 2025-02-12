@@ -1,34 +1,29 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, Platform, Dimensions } from "react-native";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebaseConfig";  // Ensure the correct path
 import { useNavigation } from "@react-navigation/native";
 import LayoutContainer from './LayoutContainer';
+import * as SecureStore from "expo-secure-store"; // To securely store the JWT token
 
-// Get screen width and height
+
 const { width, height } = Dimensions.get('window');
-
-// Determine if the platform is web or mobile
 const isWeb = Platform.OS === 'web';
-
 const minContainerWidth = isWeb ? 320 : width * 1;
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [errorMessage, setErrorMessage] = useState(""); // State for storing error messages
   const [emailError, setEmailError] = useState(""); // For email input error
   const [passwordError, setPasswordError] = useState(""); // For password input error
   const navigation = useNavigation(); // Navigation hook
 
-  // Validate email format using regular expression
   const isValidEmail = (email) => {
-    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    const regex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return regex.test(email);
   };
 
   const handleSignin = async () => {
+    console.log("Logging in with email:", email);
     setErrorMessage(""); // Clear previous errors
     setEmailError(""); // Clear email error
     setPasswordError(""); // Clear password error
@@ -47,74 +42,74 @@ export default function LoginScreen() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("Signed in");
-      navigation.replace("Home"); // Redirect to Home after login
-    } catch (error) {
-      console.error("Error signing in:", error.message);
-      
-      // Custom error handling based on Firebase error codes
-      if (error.code === "auth/user-not-found") {
-        setErrorMessage("No account found with this email.");
-        setEmailError("No account found.");
-      } else if (error.code === "auth/wrong-password") {
-        setErrorMessage("Incorrect password. Please try again.");
-        setPasswordError("Incorrect password.");
-      } else if (error.code === "auth/invalid-email") {
-        setErrorMessage("Invalid email address format.");
-        setEmailError("Invalid email address.");
-      } else {
-        setErrorMessage("An unknown error occurred. Please try again.");
+      // Replace Firebase authentication logic with an API call to Lambda
+      console.log("Logging in with email:", email);
+      const response = await fetch("https://hg14rciwsd.execute-api.eu-west-1.amazonaws.com/dev/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      console.log("Response:", response);
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        setErrorMessage(data.message || "Error logging in");
+        return;
       }
+
+      // Store the JWT token in local storage or app state
+      const token = data.token;
+      console.log("Logged in with JWT:", token);
+      await SecureStore.setItemAsync("userToken", token);
+
+
+      // Navigate to Home after login
+      navigation.replace("Home");
+    } catch (error) {
+      console.error("Error logging in:", error);
+      setErrorMessage("An unknown error occurred. Please try again.");
     }
   };
 
   return (
     <LayoutContainer>
-    <View style={styles.container}>
-      {/* App Name */}
-      <Text style={styles.appName}>Find A Sports Match</Text>
+      <View style={styles.container}>
+        <Text style={styles.appName}>Find A Sports Match</Text>
+        <Text style={styles.header}>Login</Text>
 
-      <Text style={styles.header}>Login</Text>
+        <Text style={styles.label}>Email</Text>
+        <TextInput 
+          style={[styles.input, emailError && styles.inputError]} 
+          value={email} 
+          onChangeText={setEmail} 
+          keyboardType="email-address" 
+          autoCapitalize="none"
+          placeholder="Enter your email"
+        />
+        {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput 
-        style={[styles.input, emailError && styles.inputError]} 
-        value={email} 
-        onChangeText={setEmail} 
-        keyboardType="email-address" 
-        autoCapitalize="none"
-        placeholder="Enter your email"
-      />
-      {emailError && <Text style={styles.errorText}>{emailError}</Text>}
-
-      <Text style={styles.label}>Password</Text>
-      <View style={styles.passwordContainer}>
+        <Text style={styles.label}>Password</Text>
         <TextInput
           style={[styles.input, passwordError && styles.inputError]}
           value={password}
           onChangeText={setPassword}
-          secureTextEntry={!showPassword}
+          secureTextEntry
           autoCapitalize="none"
           placeholder="Enter your password"
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.showButton}>
-          <Text style={styles.showText}>{showPassword ? "Hide" : "Show"}</Text>
-        </TouchableOpacity>
+        {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+
+        {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+
+        <Button title="Sign In" onPress={handleSignin} />
+
+        <Text style={styles.link} onPress={() => navigation.navigate("SignUp")}>
+          Don't have an account? Sign Up
+        </Text>
       </View>
-      {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
-
-      {/* Display error message if there is one */}
-      {errorMessage ? (
-        <Text style={styles.errorText}>{errorMessage}</Text>
-      ) : null}
-
-      <Button title="Sign In" onPress={handleSignin} />
-
-      <Text style={styles.link} onPress={() => navigation.navigate("SignUp")}>
-        Don't have an account? Sign Up
-      </Text>
-    </View>
     </LayoutContainer>
   );
 }
