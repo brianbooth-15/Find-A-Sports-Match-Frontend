@@ -40,6 +40,7 @@ import CreateEventScreen from "./screens/CreateEventScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ManageFriendsScreen from "./screens/ManageFriendsScreen";
 import SearchFriendsScreen from "./screens/SearchFriendsScreen";
+import MatchSportsFriendsScreen from "./screens/MatchSportsFriendsScreen";
 
 if (Platform.OS === 'web') {
   const style = document.createElement('style');
@@ -111,6 +112,7 @@ export default function App() {
         <Stack.Screen name="ManageEvents" component={ManageEventsScreen} />
         <Stack.Screen name="EditEvent" component={EditEventScreen} />
         <Stack.Screen name="ManageFriends" component={ManageFriendsScreen} />
+        <Stack.Screen name="MatchSportsFriends" component={MatchSportsFriendsScreen} />
         <Stack.Screen name="SearchFriends" component={SearchFriendsScreen} />
         <Stack.Screen name="SearchForMatch" component={SearchForMatchScreen} />
       </Stack.Navigator>

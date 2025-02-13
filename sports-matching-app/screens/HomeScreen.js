@@ -112,6 +112,11 @@ export default function HomeScreen() {
           <Text style={styles.optionText}>Manage Friends</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.optionCard} onPress={() => navigation.navigate("MatchSportsFriends")}>
+          <FontAwesome5 name="handshake" size={20} color="#007AFF" />
+          <Text style={styles.optionText}>Match Sports Friends</Text>
+        </TouchableOpacity>
+
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Logout</Text>
