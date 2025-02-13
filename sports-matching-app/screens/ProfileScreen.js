@@ -38,11 +38,11 @@ export default function ProfileScreen({ navigation }) {
     requestLocationPermission();
   }, []);
 
-  const getToken = async (key) => {
+  const getToken = async () => {
     if (Platform.OS !== "web") {
-      return await SecureStore.getItemAsync(key);
+      return await SecureStore.getItemAsync("userToken");
     } else {
-      return localStorage.getItem(key); // Fallback for web
+      return localStorage.getItem("userToken"); // Fallback for web
     }
   };
 
@@ -52,6 +52,7 @@ export default function ProfileScreen({ navigation }) {
       setLoading(true);
       const token = await getToken();
       if (!token) {
+        console.log("No token found, redirecting to login...");
         Alert.alert("Error", "User not authenticated");
         navigation.replace("Login");
         return;
@@ -67,6 +68,7 @@ export default function ProfileScreen({ navigation }) {
       });
 
       if (!response.ok) {
+        console.log("Failed to fetch profile");
         throw new Error("Failed to fetch profile");
       }
 
@@ -81,6 +83,7 @@ export default function ProfileScreen({ navigation }) {
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
+      Alert.alert("Error", "Unable to fetch profile. Please try again later.");
     } finally {
       setLoading(false);
     }
