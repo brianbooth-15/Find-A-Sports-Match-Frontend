@@ -1,39 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Dimensions, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { FontAwesome5 } from "@expo/vector-icons"; // Import icons
-import * as SecureStore from "expo-secure-store"; // To securely store the JWT token
-import LayoutContainer from './LayoutContainer';
+import { FontAwesome5 } from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store"; // Secure storage for JWT tokens
+import LayoutContainer from "./LayoutContainer";
+import { jwtDecode } from "jwt-decode";
+ // Decode JWT tokens
 
-// Get screen width and height
-const { width, height } = Dimensions.get('window');
+// Get screen width
+const { width } = Dimensions.get("window");
 
 // Determine if the platform is web or mobile
-const isWeb = Platform.OS === 'web';
-
+const isWeb = Platform.OS === "web";
 const minWidth = isWeb ? 320 : width * 0.9;
 
-console.log("HomeScreen.js");
+// Utility functions to handle storage (supports web & mobile)
+const getToken = async () => {
+  if (Platform.OS !== "web") {
+    return await SecureStore.getItemAsync("userToken");
+  } else {
+    return localStorage.getItem("userToken"); // Fallback for web
+  }
+};
+
+const removeToken = async () => {
+  if (Platform.OS !== "web") {
+    await SecureStore.deleteItemAsync("userToken");
+  } else {
+    localStorage.removeItem("userToken"); // Fallback for web
+  }
+};
 
 export default function HomeScreen() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const navigation = useNavigation();
 
-  // On initial render, check if the JWT token exists
   useEffect(() => {
     const checkAuthStatus = async () => {
       console.log("Checking authentication status...");
-      const token = await SecureStore.getItemAsync("userToken");
+      const token = await getToken();
       console.log("Token:", token);
 
       if (token) {
-        // You could decode the token here if you want to retrieve the user info from the token
-        // const decodedToken = jwt.decode(token);
-        // setUserEmail(decodedToken.email); // Assuming email is part of the JWT token payload
-        setIsAuthenticated(true);
+        try {
+          const decodedToken = jwtDecode(token); // Decode JWT token
+          console.log("Decoded Token:", decodedToken);
+          setUserEmail(decodedToken.email); // Set email from token
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error("Error decoding token:", error);
+          setIsAuthenticated(false);
+          setUserEmail(null);
+        }
       } else {
         setIsAuthenticated(false);
+        setUserEmail(null);
       }
     };
 
@@ -43,17 +65,21 @@ export default function HomeScreen() {
   // Handle logout
   const handleLogout = async () => {
     try {
-      await SecureStore.deleteItemAsync("userToken"); // Remove token from secure storage
+      await removeToken(); // Remove token from storage
       setIsAuthenticated(false);
-      setUserEmail(null); // Clear user info
+      setUserEmail(null);
       navigation.replace("Login"); // Redirect to login screen
     } catch (error) {
-      Alert.alert("Error", "Failed to log out");
+      Alert.alert("Error", "Failed to log out.");
     }
   };
 
   if (!isAuthenticated) {
-    return <Text>Loading...</Text>; // or navigate directly to login screen if not authenticated
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Checking authentication...</Text>
+      </View>
+    );
   }
 
   return (
@@ -62,7 +88,7 @@ export default function HomeScreen() {
         {/* Profile Header */}
         <View style={styles.header}>
           <FontAwesome5 name="user-circle" size={50} color="white" />
-          <Text style={styles.title}>Welcome, {userEmail || "Loading..."}</Text> 
+          <Text style={styles.title}>Welcome, {userEmail || "User"}</Text>
         </View>
 
         {/* Options */}
@@ -81,7 +107,6 @@ export default function HomeScreen() {
           <Text style={styles.optionText}>Manage Events</Text>
         </TouchableOpacity>
 
-        {/* New Manage Friends Option */}
         <TouchableOpacity style={styles.optionCard} onPress={() => navigation.navigate("ManageFriends")}>
           <FontAwesome5 name="users" size={20} color="#007AFF" />
           <Text style={styles.optionText}>Manage Friends</Text>
@@ -96,8 +121,11 @@ export default function HomeScreen() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9", minWidth: minWidth },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f9f9f9" },
+  loadingText: { fontSize: 16, color: "#007AFF" },
   header: {
     backgroundColor: "#007AFF",
     padding: 20,

@@ -22,6 +22,23 @@ export default function LoginScreen() {
     return regex.test(email);
   };
 
+  // Use SecureStore only on native platforms
+  const setToken = async (key, value) => {
+    if (Platform.OS !== "web") {
+      await SecureStore.setItemAsync(key, value);
+    } else {
+      localStorage.setItem(key, value); // Fallback for web
+    }
+  };
+
+  const getToken = async (key) => {
+    if (Platform.OS !== "web") {
+      return await SecureStore.getItemAsync(key);
+    } else {
+      return localStorage.getItem(key); // Fallback for web
+    }
+  };
+
   const handleSignin = async () => {
     console.log("Logging in with email:", email);
     setErrorMessage(""); // Clear previous errors
@@ -63,7 +80,7 @@ export default function LoginScreen() {
       // Store the JWT token in local storage or app state
       const token = data.token;
       console.log("Logged in with JWT:", token);
-      await SecureStore.setItemAsync("userToken", token);
+      await setToken("userToken", token);
 
 
       // Navigate to Home after login
