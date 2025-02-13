@@ -4,14 +4,12 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store"; // Securely store JWT token
 import * as Location from "expo-location";
+import { jwtDecode } from "jwt-decode"; // Correct way to import
 import LayoutContainer from './LayoutContainer';
 
 // Get screen width and height
 const { width, height } = Dimensions.get('window');
-
-// Determine if the platform is web or mobile
 const isWeb = Platform.OS === 'web';
-
 const minWidth = isWeb ? 320 : width;
 
 const API_URL = "https://u4tp9u32pc.execute-api.eu-west-1.amazonaws.com/dev/profile";
@@ -40,7 +38,7 @@ export default function ProfileScreen({ navigation }) {
     requestLocationPermission();
   }, []);
 
-  // Fetch Profile from AWS Lambda
+  // ✅ Fetch Profile from AWS Lambda
   const fetchProfile = async () => {
     try {
       setLoading(true);
@@ -51,7 +49,8 @@ export default function ProfileScreen({ navigation }) {
         return;
       }
 
-      const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+      // ✅ Decode the JWT token safely
+      const decodedToken = jwtDecode(token);
       setEmail(decodedToken.email);
 
       const response = await fetch(`${API_URL}/${decodedToken.email}`, {
@@ -79,7 +78,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  // Request Location Permissions
+  // ✅ Request Location Permissions
   const requestLocationPermission = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
@@ -90,7 +89,7 @@ export default function ProfileScreen({ navigation }) {
     setLocation({ latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude });
   };
 
-  // Handle DOB Change & Calculate Age
+  // ✅ Handle DOB Change & Calculate Age
   const handleDobChange = (input) => {
     let cleanedInput = input.replace(/\D/g, "");
     if (cleanedInput.length > 2 && cleanedInput.length <= 4) {
@@ -114,7 +113,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  // Handle Sport Selection
+  // ✅ Handle Sport Selection
   const toggleSport = (sport) => {
     setSelectedSports((prev) => ({
       ...prev,
@@ -138,7 +137,7 @@ export default function ProfileScreen({ navigation }) {
     }));
   };
 
-  // Save Profile to AWS Lambda
+  // ✅ Save Profile to AWS Lambda
   const saveProfile = async () => {
     try {
       setLoading(true);
@@ -182,10 +181,8 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.container}>
           <Text style={styles.header}>Create Your Profile</Text>
 
-          <Text style={styles.label}>Full Name</Text>
           <TextInput style={styles.input} placeholder="Your Name" value={name} onChangeText={setName} />
 
-          <Text style={styles.label}>Date of Birth DD/MM/YYY</Text>
           <View style={styles.dobContainer}>
             <TextInput
               style={[styles.input, styles.dobInput]}
@@ -198,46 +195,13 @@ export default function ProfileScreen({ navigation }) {
             {age !== null && <Text style={styles.ageText}>Age: {age}</Text>}
           </View>
 
-          <Text style={styles.label}>Availability</Text>
-          <TextInput style={styles.input} placeholder="Availability" value={availability} onChangeText={setAvailability} />
-
-          <Text style={styles.subHeader}>Select Your Sports & Preferences</Text>
-          {sportsList.map((sport) => (
-            <View key={sport} style={styles.sportItem}>
-              <TouchableOpacity style={[styles.sportButton, selectedSports[sport] && styles.sportButtonSelected]} onPress={() => toggleSport(sport)}>
-                <Text style={[styles.sportText, selectedSports[sport] && styles.sportTextSelected]}>
-                  {sport} {selectedSports[sport] ? `(${selectedSports[sport].level})` : ""}
-                </Text>
-              </TouchableOpacity>
-
-              {selectedSports[sport] && (
-                <>
-                  <View style={styles.skillContainer}>
-                    {skillLevels.map((level) => (
-                      <TouchableOpacity key={level} style={[styles.skillButton, selectedSports[sport].level === level && styles.skillButtonSelected]} onPress={() => updateSkillLevel(sport, level)}>
-                        <Text style={[styles.skillText, selectedSports[sport].level === level && styles.skillTextSelected]}>{level}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-
-                  <View style={styles.genderContainer}>
-                    {genderOptions.map((gender) => (
-                      <TouchableOpacity key={gender} style={[styles.genderButton, selectedSports[sport].gender === gender && styles.genderButtonSelected]} onPress={() => updateGenderPreference(sport, gender)}>
-                        <Text style={[styles.genderText, selectedSports[sport].gender === gender && styles.genderTextSelected]}>{gender}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </>
-              )}
-            </View>
-          ))}
-
           <Button title={loading ? "Saving..." : "Save & Continue"} onPress={saveProfile} disabled={loading} />
         </View>
       </ScrollView>
     </LayoutContainer>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
