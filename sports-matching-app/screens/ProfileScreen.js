@@ -38,11 +38,19 @@ export default function ProfileScreen({ navigation }) {
     requestLocationPermission();
   }, []);
 
+  const getToken = async (key) => {
+    if (Platform.OS !== "web") {
+      return await SecureStore.getItemAsync(key);
+    } else {
+      return localStorage.getItem(key); // Fallback for web
+    }
+  };
+
   // ✅ Fetch Profile from AWS Lambda
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const token = await SecureStore.getItemAsync("userToken");
+      const token = await getToken();
       if (!token) {
         Alert.alert("Error", "User not authenticated");
         navigation.replace("Login");
@@ -141,7 +149,7 @@ export default function ProfileScreen({ navigation }) {
   const saveProfile = async () => {
     try {
       setLoading(true);
-      const token = await SecureStore.getItemAsync("userToken");
+      const token = await getToken();
       if (!token) {
         Alert.alert("Error", "User not authenticated");
         navigation.replace("Login");

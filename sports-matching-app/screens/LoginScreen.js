@@ -31,14 +31,6 @@ export default function LoginScreen() {
     }
   };
 
-  const getToken = async (key) => {
-    if (Platform.OS !== "web") {
-      return await SecureStore.getItemAsync(key);
-    } else {
-      return localStorage.getItem(key); // Fallback for web
-    }
-  };
-
   const handleSignin = async () => {
     console.log("Logging in with email:", email);
     setErrorMessage(""); // Clear previous errors
