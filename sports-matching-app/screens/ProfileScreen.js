@@ -193,7 +193,40 @@ export default function ProfileScreen({ navigation }) {
               maxLength={10}
             />
             {age !== null && <Text style={styles.ageText}>Age: {age}</Text>}
-          </View>
+            </View>
+            <Text style={styles.label}>Availability</Text>
+          <TextInput style={styles.input} placeholder="Availability" value={availability} onChangeText={setAvailability} />
+
+          <Text style={styles.subHeader}>Select Your Sports & Preferences</Text>
+          {sportsList.map((sport) => (
+            <View key={sport} style={styles.sportItem}>
+              <TouchableOpacity style={[styles.sportButton, selectedSports[sport] && styles.sportButtonSelected]} onPress={() => toggleSport(sport)}>
+                <Text style={[styles.sportText, selectedSports[sport] && styles.sportTextSelected]}>
+                  {sport} {selectedSports[sport] ? `(${selectedSports[sport].level})` : ""}
+                </Text>
+              </TouchableOpacity>
+
+              {selectedSports[sport] && (
+                <>
+                  <View style={styles.skillContainer}>
+                    {skillLevels.map((level) => (
+                      <TouchableOpacity key={level} style={[styles.skillButton, selectedSports[sport].level === level && styles.skillButtonSelected]} onPress={() => updateSkillLevel(sport, level)}>
+                        <Text style={[styles.skillText, selectedSports[sport].level === level && styles.skillTextSelected]}>{level}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <View style={styles.genderContainer}>
+                    {genderOptions.map((gender) => (
+                      <TouchableOpacity key={gender} style={[styles.genderButton, selectedSports[sport].gender === gender && styles.genderButtonSelected]} onPress={() => updateGenderPreference(sport, gender)}>
+                        <Text style={[styles.genderText, selectedSports[sport].gender === gender && styles.genderTextSelected]}>{gender}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              )}
+            </View>
+          ))}
 
           <Button title={loading ? "Saving..." : "Save & Continue"} onPress={saveProfile} disabled={loading} />
         </View>
@@ -201,7 +234,6 @@ export default function ProfileScreen({ navigation }) {
     </LayoutContainer>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
