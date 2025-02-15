@@ -42,7 +42,7 @@ export default function MatchSportsFriendsScreen() {
 
       console.log("we have a token");
 
-      // ✅ Decode the JWT token safely
+      // Decode the JWT token safely
       const decodedToken = jwtDecode(token);
 
       console.log("Email:", decodedToken.email);

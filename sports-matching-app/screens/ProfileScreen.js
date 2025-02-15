@@ -46,7 +46,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  // ✅ Fetch Profile from AWS Lambda
+  // Fetch Profile from AWS Lambda
   const fetchProfile = async () => {
     try {
       setLoading(true);
@@ -58,7 +58,7 @@ export default function ProfileScreen({ navigation }) {
         return;
       }
 
-      // ✅ Decode the JWT token safely
+      // Decode the JWT token safely
       const decodedToken = jwtDecode(token);
       setEmail(decodedToken.email);
 
@@ -89,7 +89,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  // ✅ Request Location Permissions
+  // Request Location Permissions
   const requestLocationPermission = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
@@ -100,7 +100,7 @@ export default function ProfileScreen({ navigation }) {
     setLocation({ latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude });
   };
 
-  // ✅ Handle DOB Change & Calculate Age
+  // Handle DOB Change & Calculate Age
   const handleDobChange = (input) => {
     let cleanedInput = input.replace(/\D/g, "");
     if (cleanedInput.length > 2 && cleanedInput.length <= 4) {
@@ -124,7 +124,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  // ✅ Handle Sport Selection
+  // Handle Sport Selection
   const toggleSport = (sport) => {
     setSelectedSports((prev) => ({
       ...prev,
@@ -148,7 +148,7 @@ export default function ProfileScreen({ navigation }) {
     }));
   };
 
-  // ✅ Save Profile to AWS Lambda
+  // Save Profile to AWS Lambda
   const saveProfile = async () => {
     try {
       setLoading(true);
