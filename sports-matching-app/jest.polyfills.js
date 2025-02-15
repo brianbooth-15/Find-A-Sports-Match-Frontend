@@ -16,7 +16,6 @@ Object.defineProperties(globalThis, {
 });
 
 const { Blob, File } = require('node:buffer');
-// const { fetch, Headers, FormData, Request, Response } = require('undici');
 
 Object.defineProperties(globalThis, {
   fetch: { value: fetch, writable: true },
