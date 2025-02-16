@@ -42,7 +42,6 @@ import HomeScreen from "./screens/HomeScreen";
 import ManageFriendsScreen from "./screens/ManageFriendsScreen";
 import SearchFriendsScreen from "./screens/SearchFriendsScreen";
 import MatchSportsFriendsScreen from "./screens/MatchSportsFriendsScreen";
-import { DivOverlay } from 'leaflet';
 
 if (Platform.OS === 'web') {
   const style = document.createElement('style');
