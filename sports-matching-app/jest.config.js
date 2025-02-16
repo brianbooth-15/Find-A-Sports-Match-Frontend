@@ -1,4 +1,18 @@
 module.exports = {
-    setupFiles: ['<rootDir>/jest.polyfills.js'], // Point to your setup file
-    testEnvironment: 'node', // Or 'jsdom', depending on your environment
+    preset: 'react-native',
+    transform: {
+      '^.+\\.[tj]sx?$': 'babel-jest', // Ensure Babel transforms JS and TS files
+    },
+    transformIgnorePatterns: [
+      'node_modules/(?!(react-native|expo-secure-store|@react-native|react-native-reanimated)/)', // ✅ Allow transforming expo-secure-store
+    ],
+    setupFiles: [
+      './node_modules/react-native-gesture-handler/jestSetup.js',
+    ],
+    setupFilesAfterEnv: [
+      '@testing-library/jest-native/extend-expect',
+      '<rootDir>/jestSetup.js',
+    ],
+    testEnvironment: 'node',
   };
+  

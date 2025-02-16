@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "strict": false,
+      "noImplicitAny": false,
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowJs": true,
+      "resolveJsonModule": true,
+      "downlevelIteration": true,
+      "target": "ES6",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "jsx": "react-jsx",
+      "typeRoots": ["./@types", "./node_modules/@types"]  // ✅ Include custom type definitions
+    },
+    "include": [
+      "src/**/*",
+      "@types/**/*.d.ts",  // ✅ Ensure TypeScript looks for custom types
+      "node_modules/react-native-reanimated/**/*.tsx",
+      "node_modules/react-native-reanimated/**/*.ts"
+    ]
+  }
+  
