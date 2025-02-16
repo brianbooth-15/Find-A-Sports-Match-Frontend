@@ -116,7 +116,7 @@ export default function LoginScreen() {
         <Button title="Sign In" onPress={handleSignin} />
 
         <Text style={styles.link} onPress={() => navigation.navigate("SignUp")}>
-          Don't have an account? Sign Up
+          Don&apos;t have an account? Sign Up
         </Text>
       </View>
     </LayoutContainer>

@@ -3,6 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, ScrollView, Dimensions, Plat
 import { Picker } from "@react-native-picker/picker";
 // import Slider from "@react-native-community/slider";
 
+import PropTypes from 'prop-types';  // Import PropTypes for validation
+
 import LayoutContainer from './LayoutContainer';
 
 // Get screen width and height
@@ -99,6 +101,29 @@ export default function EditEventScreen({ route, navigation }) {
     </LayoutContainer>
   );
 }
+
+// Add PropTypes validation
+EditEventScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      event: PropTypes.shape({
+        sport: PropTypes.string.isRequired,
+        skill: PropTypes.string.isRequired,
+        date: PropTypes.string.isRequired,
+        startTime: PropTypes.string.isRequired,
+        endTime: PropTypes.string.isRequired,
+        participants: PropTypes.number.isRequired,
+        gender: PropTypes.string.isRequired,
+        cost: PropTypes.number,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+EditEventScreen.displayName = 'EditEventScreen';  // Set display name for debugging
 
 const styles = StyleSheet.create({
   container: { padding: 20, minWidth: minWidth },

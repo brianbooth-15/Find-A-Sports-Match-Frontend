@@ -103,6 +103,15 @@ export default function SearchForMatchScreen({ navigation }) {
   );
 }
 
+SearchForMatchScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+SearchForMatchScreen.displayName = "SearchForMatchScreen"; // ✅ Set display name for debugging
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

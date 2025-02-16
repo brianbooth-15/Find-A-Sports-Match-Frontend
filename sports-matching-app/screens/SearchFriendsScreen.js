@@ -66,6 +66,15 @@ export default function SearchFriendsScreen({ navigation }) {
   );
 }
 
+SearchFriendsScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+SearchFriendsScreen.displayName = "SearchFriendsScreen"; // ✅ Set display name for debugging
+
+
 // Styles
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9", minWidth: minWidth },

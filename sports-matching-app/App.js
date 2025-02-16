@@ -29,6 +29,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { onAuthStateChanged } from "firebase/auth"; // Only import authentication methods
 import { auth } from "./firebaseConfig";  // Import Firebase auth
 
+import PropTypes from 'prop-types'; // Import PropTypes for prop validation
 
 import EditEventScreen from "./screens/EditEventScreen";
 import ManageEventsScreen from "./screens/ManageEventsScreen";
@@ -41,6 +42,7 @@ import HomeScreen from "./screens/HomeScreen";
 import ManageFriendsScreen from "./screens/ManageFriendsScreen";
 import SearchFriendsScreen from "./screens/SearchFriendsScreen";
 import MatchSportsFriendsScreen from "./screens/MatchSportsFriendsScreen";
+import { DivOverlay } from 'leaflet';
 
 if (Platform.OS === 'web') {
   const style = document.createElement('style');
@@ -62,12 +64,9 @@ if (Platform.OS === 'web') {
   document.head.appendChild(style);
 }
 
-
-
-
 const Stack = createStackNavigator();
 
-export default function App() {
+function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // `null` initially to avoid unnecessary renders
   const [isLoading, setIsLoading] = useState(true);
 
@@ -119,3 +118,11 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+// Fix: Adding PropTypes for validation
+App.propTypes = {
+  isAuthenticated: PropTypes.bool,
+  isLoading: PropTypes.bool,
+};
+
+export default App;
