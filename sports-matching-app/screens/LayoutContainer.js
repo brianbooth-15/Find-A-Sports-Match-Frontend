@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Platform, Dimensions } from 'react-native';
+import PropTypes from 'prop-types'; // Import PropTypes for validation
 
 // Get screen width and height
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 // Determine if the platform is web or mobile
 const isWeb = Platform.OS === 'web';
@@ -19,8 +20,7 @@ const LayoutContainer = ({ children }) => {
         { 
           maxWidth: maxWidth, 
           minWidth: minWidth, 
-          height: 'auto',  // Allow dynamic height
-          paddingTop: 50, // Top padding for better spacing
+          paddingTop: 50,  // Top padding for better spacing
           marginBottom: 20,  // To prevent any excess space at the bottom
         }
       ]}
@@ -30,6 +30,14 @@ const LayoutContainer = ({ children }) => {
   );
 };
 
+// Add PropTypes validation
+LayoutContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+// Explicitly set display name for debugging
+LayoutContainer.displayName = 'LayoutContainer';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,  
@@ -37,8 +45,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',  // Center content horizontally
     backgroundColor: '#f9f9f9',
     alignSelf: 'center',  // Center the container
-    overflowY: 'auto',  // Enable scrolling if content exceeds height
-    maxHeight: '100vh',  // Ensure it doesn’t exceed viewport height
   },
 });
 

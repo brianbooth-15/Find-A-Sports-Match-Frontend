@@ -21,6 +21,10 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Run ESLint Check  # ✅ Added Linting Step
+        run: |
+          npx eslint . --max-warnings=0
+
       - name: Run Tests
         run: npm test
 
@@ -47,11 +51,10 @@ jobs:
           fi
           echo "✅ Quality Gate Passed!"
 
-    notify_amplify:
+  notify_amplify:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
       - name: Trigger AWS Amplify Deploy
         run: |
           curl -X POST -d '{}' "${{ secrets.AMPLIFY_WEBHOOK_URL }}" -H "Content-Type:application/json"
-

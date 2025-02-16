@@ -4,6 +4,8 @@ import {
   Platform 
 } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import PropTypes from 'prop-types';  // Import PropTypes for validation
+
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 
@@ -164,6 +166,16 @@ export default function CreateEventScreen({ navigation }) {
     </KeyboardAvoidingView>
   );
 }
+
+// Add PropTypes validation
+CreateEventScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+CreateEventScreen.displayName = 'CreateEventScreen';  // Set display name for debugging
+
 
 const styles = StyleSheet.create({
   container: {

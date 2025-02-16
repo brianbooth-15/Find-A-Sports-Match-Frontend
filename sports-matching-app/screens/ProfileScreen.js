@@ -246,6 +246,16 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
+ProfileScreen.propTypes = {
+  navigation: PropTypes.shape({
+    replace: PropTypes.func.isRequired,
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+ProfileScreen.displayName = "ProfileScreen"; // ✅ Set display name for debugging
+
+
 const styles = StyleSheet.create({
   container: {
     padding: 20,
