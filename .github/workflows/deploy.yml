@@ -19,10 +19,12 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm ci
-
-      - name: Run ESLint Check  # ✅ Added Linting Step
         run: |
+          cd sports-matching-app
+          npm ci
+
+      - name: Run ESLint Check  
+          cd sports-matching-app  
           npx eslint . --max-warnings=0
 
       - name: Run Tests
