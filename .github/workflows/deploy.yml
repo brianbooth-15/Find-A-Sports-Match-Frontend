@@ -29,7 +29,9 @@ jobs:
           npx eslint . --max-warnings=0
 
       - name: Run Tests
-        run: npm test
+        run: |
+          cd sports-matching-app
+          npm test
 
       - name: Run SonarQube Analysis
         env:
