@@ -23,8 +23,9 @@ jobs:
           cd sports-matching-app
           npm ci
 
-      - name: Run ESLint Check  
-          cd sports-matching-app  
+      - name: Run ESLint Check
+        run: |
+          cd sports-matching-app
           npx eslint . --max-warnings=0
 
       - name: Run Tests
